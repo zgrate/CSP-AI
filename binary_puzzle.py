@@ -219,6 +219,9 @@ if __name__ == '__main__':
 
     solve_puzzle_forward("dane\\binary_6x6", True, SEQUENTIAL_HEURISTIC)
     solve_puzzle_forward("dane\\binary_6x6", True, RANDOM_HEURISTIC)
+    solve_puzzle_backtrack("dane\\binary_6x6", True, SEQUENTIAL_HEURISTIC)
+    solve_puzzle_backtrack("dane\\binary_6x6", True, RANDOM_HEURISTIC)
+
     exit(0)
     solve_puzzle_forward("dane\\binary_8x8", False)
     solve_puzzle_forward("dane\\binary_10x10", False)

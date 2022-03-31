@@ -1,6 +1,6 @@
 from tabulate import tabulate
 
-from csp import CSP_Answer, CSP_Solver
+from csp import CSP_Answer, CSP_Solver, SEQUENTIAL_HEURISTIC, RANDOM_HEURISTIC
 from utils import get_answer_in_pos, null_answer
 
 
@@ -71,11 +71,11 @@ class Futoshiki:
         self.bigger_constraint = bigger_constraint
         self.solver = CSP_Solver([x for x in range(n)], futoshiki_tester, self, self.generate_unsolved_positions())
 
-    def try_solve_backtracking(self):
-        return self.solver.try_backtrack(self.loaded_numbers)
+    def try_solve_backtracking(self, heuristic):
+        return self.solver.try_backtrack(self.loaded_numbers, heuristic)
 
-    def try_solve_forward(self):
-        return self.solver.try_forward(self.loaded_numbers)
+    def try_solve_forward(self, heuristic):
+        return self.solver.try_forward(self.loaded_numbers, heuristic)
 
     def get_futoshiki_table(self, answers: list[CSP_Answer] = None, add_equals: bool = False, empty_string: str = " ",
                             display_format=False):
@@ -145,12 +145,12 @@ def load_futoshiki(file_name):
     return Futoshiki(y, answers, constraints)
 
 
-def solve_futoshiki_backtrack(file_name, print_solutions=False):
+def solve_futoshiki_backtrack(file_name, print_solutions=False, heuristic=SEQUENTIAL_HEURISTIC):
     futoshiki = load_futoshiki(file_name)
     # print(tabulate(futoshiki.get_futoshiki_table(None, True, "x")))
     # for c in futoshiki.bigger_constraint:
     #     print(c)
-    sol = futoshiki.try_solve_backtracking()
+    sol = futoshiki.try_solve_backtracking(heuristic)
     print(f"FOUND {len(sol)} SOLUTIONS FOR {file_name}")
     if print_solutions:
         i = 1
@@ -160,9 +160,9 @@ def solve_futoshiki_backtrack(file_name, print_solutions=False):
             i += 1
 
 
-def solve_futoshiki_forward(file_name, print_solutions=False):
+def solve_futoshiki_forward(file_name, print_solutions=False, heuristic=SEQUENTIAL_HEURISTIC):
     futoshiki = load_futoshiki(file_name)
-    sol = futoshiki.try_solve_forward()
+    sol = futoshiki.try_solve_forward(heuristic)
     print(f"FOUND {len(sol)} SOLUTIONS FOR {file_name}")
     if print_solutions:
         i = 1
@@ -173,7 +173,11 @@ def solve_futoshiki_forward(file_name, print_solutions=False):
 
 
 if __name__ == '__main__':
-    solve_futoshiki_forward("dane\\futoshiki_4x4", True)
+    solve_futoshiki_forward("dane\\futoshiki_4x4", True, SEQUENTIAL_HEURISTIC)
+    solve_futoshiki_forward("dane\\futoshiki_4x4", True, RANDOM_HEURISTIC)
+    solve_futoshiki_backtrack("dane\\futoshiki_4x4", True, SEQUENTIAL_HEURISTIC)
+    solve_futoshiki_backtrack("dane\\futoshiki_4x4", True, RANDOM_HEURISTIC)
+    exit(0)
     solve_futoshiki_forward("dane\\futoshiki_5x5", False)
     solve_futoshiki_forward("dane\\futoshiki_6x6", False)
 

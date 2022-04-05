@@ -225,7 +225,7 @@ if __name__ == '__main__':
     b = [5, 6]
     c = a + b
 
-    with open("puzzle_results2.txt", "w", encoding="utf-8") as output:
+    with open("puzzle_results3.txt", "w", encoding="utf-8") as output:
         output.write("input;method;heuristic;domain_heuristic;nodes;time\n")
         for heuristic in [SEQUENTIAL_HEURISTIC, RANDOM_HEURISTIC]:
             for domain_heuristic in [SEQUENTIAL_HEURISTIC, RANDOM_HEURISTIC]:

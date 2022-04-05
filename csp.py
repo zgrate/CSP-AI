@@ -48,6 +48,8 @@ class CSP_Solver:
     def backtracking_recurrence(self, current_solution: list[CSP_Answer], variable_solutions_list: list,
                                 total_solutions: list[list[CSP_Answer]], variable_index: int, number_of_enters: dict,
                                 domain_heuristic: str):
+        if len(total_solutions) > 0:
+            return
         number_of_enters["number"] += 1
         if len(variable_solutions_list) == variable_index:
             total_solutions.append(current_solution)
@@ -83,8 +85,8 @@ class CSP_Solver:
                                     total_solutions: list[list[CSP_Answer]], variable_index: int,
                                     number_of_enters: dict, domain_heuristic):
         number_of_enters["number"] += 1
-        # if len(total_solutions) > 0:
-        #     return
+        if len(total_solutions) > 0:
+            return
 
         if len(variable_solutions_list) == variable_index:
             total_solutions.append(current_solution)

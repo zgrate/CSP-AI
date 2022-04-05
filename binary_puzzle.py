@@ -141,14 +141,14 @@ class BinaryPuzzle:
             l[e.variable_position[1]][e.variable_position[0]] = e.answer_domain
         return l
 
-    def try_solve_backtracking(self, heuristic: int):
-        return self.solver.try_backtrack(self.loaded_data, heuristic)
+    def try_solve_backtracking(self, heuristic, domain_hauristic):
+        return self.solver.try_backtrack(self.loaded_data, heuristic, domain_hauristic)
 
     def __str__(self):
         return tabulate(self.binary_puzzle_get_array())
 
-    def try_solve_forward(self, heuristic: int):
-        return self.solver.try_forward(self.loaded_data, heuristic)
+    def try_solve_forward(self, heuristic, domain_hauristic):
+        return self.solver.try_forward(self.loaded_data, heuristic, domain_hauristic)
 
 
 def load_binary_puzzle(filename: str) -> BinaryPuzzle:
@@ -167,9 +167,12 @@ def load_binary_puzzle(filename: str) -> BinaryPuzzle:
         return BinaryPuzzle(x, y, loaded_data)
 
 
-def solve_puzzle_backtrack(file_name, print_solutions=False, heuristic=SEQUENTIAL_HEURISTIC):
+def solve_puzzle_backtrack(file_name, print_solutions=False, heuristic=SEQUENTIAL_HEURISTIC,
+                           domain_heuristic=SEQUENTIAL_HEURISTIC):
+    print(
+        f"Trying binary puzzle Backtracking with Heuristic: {'sequential' if heuristic == SEQUENTIAL_HEURISTIC else 'randomised'} and domain {domain_heuristic}")
     puzzle = load_binary_puzzle(file_name)
-    sol = puzzle.try_solve_backtracking(heuristic)
+    sol, tup = puzzle.try_solve_backtracking(heuristic, domain_heuristic)
     print(f"FOUND {len(sol)} SOLUTIONS FOR {file_name}")
     if print_solutions:
         i = 1
@@ -177,11 +180,15 @@ def solve_puzzle_backtrack(file_name, print_solutions=False, heuristic=SEQUENTIA
             print(f"SOLUTION {i}")
             print(tabulate(puzzle.binary_puzzle_get_array(e, "x")))
             i += 1
+    return tup
 
 
-def solve_puzzle_forward(file_name, print_solutions=False, heuristic=SEQUENTIAL_HEURISTIC):
+def solve_puzzle_forward(file_name, print_solutions=False, heuristic=SEQUENTIAL_HEURISTIC,
+                         domain_hauristic=SEQUENTIAL_HEURISTIC) -> tuple[int, float]:
+    print(
+        f"Trying binary puzzle Forward Tracking with Heuristic: {'sequential' if heuristic == SEQUENTIAL_HEURISTIC else 'randomised'} AND DOMAIN: {domain_hauristic}")
     puzzle = load_binary_puzzle(file_name)
-    sol = puzzle.try_solve_forward(heuristic)
+    sol, timers = puzzle.try_solve_forward(heuristic, domain_hauristic)
     print(f"FOUND {len(sol)} SOLUTIONS FOR {file_name}")
     if print_solutions:
         i = 1
@@ -189,6 +196,7 @@ def solve_puzzle_forward(file_name, print_solutions=False, heuristic=SEQUENTIAL_
             print(f"SOLUTION {i}")
             print(tabulate(puzzle.binary_puzzle_get_array(e, "x")))
             i += 1
+    return timers
 
 
 if __name__ == '__main__':
@@ -217,12 +225,27 @@ if __name__ == '__main__':
     b = [5, 6]
     c = a + b
 
-    solve_puzzle_forward("dane\\binary_6x6", True, SEQUENTIAL_HEURISTIC)
-    solve_puzzle_forward("dane\\binary_6x6", True, RANDOM_HEURISTIC)
-    solve_puzzle_backtrack("dane\\binary_6x6", True, SEQUENTIAL_HEURISTIC)
-    solve_puzzle_backtrack("dane\\binary_6x6", True, RANDOM_HEURISTIC)
+    with open("puzzle_results2.txt", "w", encoding="utf-8") as output:
+        output.write("input;method;heuristic;domain_heuristic;nodes;time\n")
+        for heuristic in [SEQUENTIAL_HEURISTIC, RANDOM_HEURISTIC]:
+            for domain_heuristic in [SEQUENTIAL_HEURISTIC, RANDOM_HEURISTIC]:
+                for input_file in ["dane\\binary_6x6", "dane\\binary_8x8", "dane\\binary_10x10"]:
+                    sol = solve_puzzle_backtrack(input_file, False, heuristic, domain_heuristic)
+                    output.write(f"{input_file};backtracking;{heuristic};{domain_heuristic};{sol[0]};{sol[1]}\n")
+                    sol = solve_puzzle_forward(input_file, False, heuristic, domain_heuristic)
+                    output.write(f"{input_file};forward;{heuristic};{domain_heuristic};{sol[0]};{sol[1]}\n")
+    exit()
+    print("Solution Test")
+    print(solve_puzzle_forward("dane\\binary_6x6", False, SEQUENTIAL_HEURISTIC))
+    print()
+    exit()
 
-    exit(0)
+    print("Time test")
+    solve_puzzle_forward("dane\\binary_6x6", False, SEQUENTIAL_HEURISTIC)
+    solve_puzzle_forward("dane\\binary_6x6", False, RANDOM_HEURISTIC)
+    solve_puzzle_backtrack("dane\\binary_6x6", False, SEQUENTIAL_HEURISTIC)
+    solve_puzzle_backtrack("dane\\binary_6x6", False, RANDOM_HEURISTIC)
+
     solve_puzzle_forward("dane\\binary_8x8", False)
     solve_puzzle_forward("dane\\binary_10x10", False)
 

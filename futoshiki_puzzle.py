@@ -71,11 +71,11 @@ class Futoshiki:
         self.bigger_constraint = bigger_constraint
         self.solver = CSP_Solver([x for x in range(n)], futoshiki_tester, self, self.generate_unsolved_positions())
 
-    def try_solve_backtracking(self, heuristic):
-        return self.solver.try_backtrack(self.loaded_numbers, heuristic)
+    def try_solve_backtracking(self, heuristic, domain_heuristic):
+        return self.solver.try_backtrack(self.loaded_numbers, heuristic, domain_heuristic)
 
-    def try_solve_forward(self, heuristic):
-        return self.solver.try_forward(self.loaded_numbers, heuristic)
+    def try_solve_forward(self, heuristic, domain_heuristic):
+        return self.solver.try_forward(self.loaded_numbers, heuristic, domain_heuristic)
 
     def get_futoshiki_table(self, answers: list[CSP_Answer] = None, add_equals: bool = False, empty_string: str = " ",
                             display_format=False):
@@ -145,12 +145,15 @@ def load_futoshiki(file_name):
     return Futoshiki(y, answers, constraints)
 
 
-def solve_futoshiki_backtrack(file_name, print_solutions=False, heuristic=SEQUENTIAL_HEURISTIC):
+def solve_futoshiki_backtrack(file_name, print_solutions=False, heuristic=SEQUENTIAL_HEURISTIC,
+                              domain_heuristic=SEQUENTIAL_HEURISTIC):
+    print(
+        f"Trying futoshiki Backtracking with Heuristic: {'sequential' if heuristic == SEQUENTIAL_HEURISTIC else 'randomised'} and domain {domain_heuristic}")
     futoshiki = load_futoshiki(file_name)
     # print(tabulate(futoshiki.get_futoshiki_table(None, True, "x")))
     # for c in futoshiki.bigger_constraint:
     #     print(c)
-    sol = futoshiki.try_solve_backtracking(heuristic)
+    sol, tup = futoshiki.try_solve_backtracking(heuristic, domain_heuristic)
     print(f"FOUND {len(sol)} SOLUTIONS FOR {file_name}")
     if print_solutions:
         i = 1
@@ -158,11 +161,15 @@ def solve_futoshiki_backtrack(file_name, print_solutions=False, heuristic=SEQUEN
             print(f"SOLUTION {i}")
             print(tabulate(futoshiki.get_futoshiki_table(e, True, "ERROR", display_format=True)))
             i += 1
+    return tup
 
 
-def solve_futoshiki_forward(file_name, print_solutions=False, heuristic=SEQUENTIAL_HEURISTIC):
+def solve_futoshiki_forward(file_name, print_solutions=False, heuristic=SEQUENTIAL_HEURISTIC,
+                            domain_heuristic=SEQUENTIAL_HEURISTIC):
+    print(
+        f"Trying futoshiki Forward Checking with Heuristic: {'sequential' if heuristic == SEQUENTIAL_HEURISTIC else 'randomised'} and doamin {domain_heuristic}")
     futoshiki = load_futoshiki(file_name)
-    sol = futoshiki.try_solve_forward(heuristic)
+    sol, tup = futoshiki.try_solve_forward(heuristic, domain_heuristic)
     print(f"FOUND {len(sol)} SOLUTIONS FOR {file_name}")
     if print_solutions:
         i = 1
@@ -170,13 +177,27 @@ def solve_futoshiki_forward(file_name, print_solutions=False, heuristic=SEQUENTI
             print(f"SOLUTION {i}")
             print(tabulate(futoshiki.get_futoshiki_table(e, True, "ERROR", display_format=True)))
             i += 1
+    return tup
 
 
 if __name__ == '__main__':
+
+    with open("futoshiki_results2.txt", "w", encoding="utf-8") as output:
+        output.write("input;method;heuristic;domain_heuristic;nodes;time\n")
+        for heuristic in [SEQUENTIAL_HEURISTIC, RANDOM_HEURISTIC]:
+            for domain_heuristic in [SEQUENTIAL_HEURISTIC, RANDOM_HEURISTIC]:
+                for input_file in ["dane\\futoshiki_4x4", "dane\\futoshiki_5x5", "dane\\futoshiki_6x6"]:
+                    sol = solve_futoshiki_backtrack(input_file, False, heuristic, domain_heuristic)
+                    output.write(f"{input_file};backtracking;{heuristic};{domain_heuristic};{sol[0]};{sol[1]}\n")
+                    sol = solve_futoshiki_forward(input_file, False, heuristic, domain_heuristic)
+                    output.write(f"{input_file};forward;{heuristic};{domain_heuristic};{sol[0]};{sol[1]}\n")
+    exit()
+
     solve_futoshiki_forward("dane\\futoshiki_4x4", True, SEQUENTIAL_HEURISTIC)
-    solve_futoshiki_forward("dane\\futoshiki_4x4", True, RANDOM_HEURISTIC)
-    solve_futoshiki_backtrack("dane\\futoshiki_4x4", True, SEQUENTIAL_HEURISTIC)
-    solve_futoshiki_backtrack("dane\\futoshiki_4x4", True, RANDOM_HEURISTIC)
+    solve_futoshiki_forward("dane\\futoshiki_4x4", False, SEQUENTIAL_HEURISTIC)
+    solve_futoshiki_forward("dane\\futoshiki_4x4", False, RANDOM_HEURISTIC)
+    solve_futoshiki_backtrack("dane\\futoshiki_4x4", False, SEQUENTIAL_HEURISTIC)
+    solve_futoshiki_backtrack("dane\\futoshiki_4x4", False, RANDOM_HEURISTIC)
     exit(0)
     solve_futoshiki_forward("dane\\futoshiki_5x5", False)
     solve_futoshiki_forward("dane\\futoshiki_6x6", False)

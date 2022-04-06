@@ -225,6 +225,10 @@ if __name__ == '__main__':
     b = [5, 6]
     c = a + b
 
+    solve_puzzle_forward("dane\\binary_6x6", True, SEQUENTIAL_HEURISTIC, SEQUENTIAL_HEURISTIC)
+
+    exit(0)
+
     with open("puzzle_results3.txt", "w", encoding="utf-8") as output:
         output.write("input;method;heuristic;domain_heuristic;nodes;time\n")
         for heuristic in [SEQUENTIAL_HEURISTIC, RANDOM_HEURISTIC]:

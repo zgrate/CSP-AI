@@ -181,7 +181,8 @@ def solve_futoshiki_forward(file_name, print_solutions=False, heuristic=SEQUENTI
 
 
 if __name__ == '__main__':
-
+    solve_futoshiki_backtrack("dane\\futoshiki", True, SEQUENTIAL_HEURISTIC, SEQUENTIAL_HEURISTIC)
+    exit()
     with open("futoshiki_results3.txt", "w", encoding="utf-8") as output:
         output.write("input;method;heuristic;domain_heuristic;nodes;time\n")
         for heuristic in [SEQUENTIAL_HEURISTIC, RANDOM_HEURISTIC]:
